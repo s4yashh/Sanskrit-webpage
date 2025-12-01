@@ -1,0 +1,194 @@
+<script lang="ts">
+  interface Chapter {
+    id: number;
+    title: string;
+    description: string;
+  }
+
+  const chapters: Chapter[] = [
+    { id: 1, title: 'Chapter 1', description: 'Arjuna Vishada Yoga' },
+    { id: 2, title: 'Chapter 2', description: 'Sankhya Yoga' },
+    { id: 3, title: 'Chapter 3', description: 'Karma Yoga' },
+    { id: 4, title: 'Chapter 4', description: 'Jnana Yoga' },
+    { id: 5, title: 'Chapter 5', description: 'Sannyasa Yoga' },
+    { id: 6, title: 'Chapter 6', description: 'Dhyana Yoga' },
+  ];
+
+  let hoveredChapter: number | null = null;
+</script>
+
+<section class="chapters-section">
+  <h2 class="section-title">GITA CHAPTERS</h2>
+  
+  <div class="chapters-grid">
+    {#each chapters as chapter (chapter.id)}
+      <div
+        class="chapter-card"
+        on:mouseenter={() => (hoveredChapter = chapter.id)}
+        on:mouseleave={() => (hoveredChapter = null)}
+        role="button"
+        tabindex="0"
+        on:keydown={(e) => {
+          if (e.key === 'Enter') {
+            // Navigate to chapter
+          }
+        }}
+      >
+        <div class="chapter-card-inner">
+          <div class="chapter-image-wrapper">
+            <img src="/gita_book.jpg" alt={`Chapter ${chapter.id}`} class="chapter-image" />
+          </div>
+          <div class="chapter-number">{chapter.id}</div>
+        </div>
+        {#if hoveredChapter === chapter.id}
+          <div class="chapter-tooltip">
+            <h3>{chapter.title}</h3>
+            <p>{chapter.description}</p>
+          </div>
+        {/if}
+      </div>
+    {/each}
+  </div>
+</section>
+
+<style>
+  .chapters-section {
+    background-color: #f5f1e8;
+    padding: 80px 40px;
+    text-align: center;
+  }
+
+  .section-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #c41e3a;
+    letter-spacing: 2px;
+    margin: 0 0 60px 0;
+    text-transform: uppercase;
+    border-bottom: 3px solid #c41e3a;
+    padding-bottom: 15px;
+    display: inline-block;
+    font-family: 'Georgia', serif;
+  }
+
+  .chapters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 40px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .chapter-card {
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 180px;
+  }
+
+  .chapter-card-inner {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    transition: transform 0.3s ease;
+  }
+
+  .chapter-card:hover .chapter-card-inner {
+    transform: scale(1.05);
+  }
+
+  .chapter-image-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: rotate(45deg);
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .chapter-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: rotate(-45deg) scale(1.4);
+    transform-origin: center;
+  }
+
+  .chapter-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    z-index: 10;
+    mix-blend-mode: screen;
+  }
+
+  .chapter-tooltip {
+    position: absolute;
+    bottom: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 4px;
+    width: 180px;
+    text-align: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 20;
+  }
+
+  .chapter-card:hover .chapter-tooltip {
+    opacity: 1;
+  }
+
+  .chapter-tooltip h3 {
+    font-size: 14px;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+  }
+
+  .chapter-tooltip p {
+    font-size: 12px;
+    margin: 0;
+    color: #ccc;
+  }
+
+  @media (max-width: 768px) {
+    .chapters-section {
+      padding: 60px 20px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      margin-bottom: 40px;
+    }
+
+    .chapters-grid {
+      gap: 30px;
+    }
+
+    .chapter-card {
+      height: 140px;
+    }
+
+    .chapter-card-inner {
+      width: 130px;
+      height: 130px;
+    }
+
+    .chapter-number {
+      font-size: 36px;
+    }
+  }
+</style>
