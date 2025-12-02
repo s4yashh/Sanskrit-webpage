@@ -46,7 +46,7 @@
 
   .footer {
     background-color: #3D4C36;
-    padding: 0px 20px;
+    padding: 30px 20px 0px 20px;
     text-align: center;
     color: #d4c4a0;
   }
@@ -57,14 +57,14 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0px;
+    gap: 12px;
   }
 
   .connect-section {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 15px;
+    gap: 0px;
   }
 
   .connect-text {
@@ -105,7 +105,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    
   }
 
   .om-symbol {
@@ -126,7 +126,7 @@
     font-size: 40px;
     font-weight: 400;
     letter-spacing: 2px;
-    margin: 5px 0 0 0;
+    margin: 5px 0 -20px 0;
     color: #AEA17E;
     font-family: 'Edensor', serif;
     text-transform: uppercase;
@@ -136,7 +136,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 0px;
   }
 
   .copyright-text {
@@ -163,7 +163,7 @@
     }
 
     .footer-container {
-      gap: 30px;
+      gap: 3px;
     }
 
     .brand-title {
