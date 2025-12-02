@@ -1,8 +1,0 @@
-@font-face {
-    font-family: 'Edensor';
-    font-style: normal;
-    font-weight: 400;
-    src: local('Edensor'), url('https://fonts.cdnfonts.com/s/84410/Edensor-Free.woff') format('woff');
-}
-
-

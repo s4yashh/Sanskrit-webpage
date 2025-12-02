@@ -33,10 +33,10 @@
       class:show={isMobileMenuOpen}
     >
       <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-        <!-- Search -->
-        <li class="nav-item active">
-          <a class="nav-link" href="/search">
-            <i class="fa fa-search"></i>
+        <!-- Search Icon Image -->
+        <li class="nav-item">
+          <a class="nav-link search-link" href="/search">
+            <img src="/src/assets/search.png" alt="Search" class="search-img" />
           </a>
         </li>
 
@@ -438,5 +438,21 @@
       padding: 0.5rem 1rem 0.5rem 1.5rem;
       font-size: 0.75rem;
     }
+  }
+
+  .search-link {
+    display: flex;
+    align-items: center;
+  }
+
+  .search-img {
+    height: 24px;
+    width: auto;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .search-img:hover {
+    opacity: 0.7;
   }
 </style>
