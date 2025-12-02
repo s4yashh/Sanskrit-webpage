@@ -14,7 +14,7 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container nav-container">
     <a class="navbar-brand" href="/">
-      <img src="/logo.png" alt="Logo" />
+      <img src="/images/logo.png" alt="Logo" />
     </a>
     <button
       class="navbar-toggler"
