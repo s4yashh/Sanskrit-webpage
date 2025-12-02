@@ -165,7 +165,7 @@
 <style>
   .navbar {
     background-color: #f8f9fa;
-    padding: 0.5rem 0;
+    padding: 3.0rem 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: sticky;
     top: 0;
@@ -173,7 +173,7 @@
   }
 
   .navbar.bg-light {
-    background-color: #f8f9fa !important;
+    background-color: #ffffff !important;
   }
 
   .nav-container {
@@ -181,9 +181,9 @@
     margin: 0 auto;
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 15px;
+    align-items: 23px;
+     justify-content: 12px;
+    padding: 0 5px;
   }
 
   .navbar-brand {
@@ -196,12 +196,16 @@
     white-space: nowrap;
     text-decoration: none;
     flex-shrink: 0;
+    position: absolute;
+    left: 1px;
+    top: -5px;
   }
 
   .navbar-brand img {
-    height: 50px;
+    height: 60px;
     width: auto;
     display: block;
+
   }
 
   .navbar-toggler {
@@ -235,6 +239,10 @@
   .collapse.navbar-collapse {
     display: flex;
     flex-basis: auto;
+    margin-left: auto;
+    margin-right: -240px;
+    position: relative;
+    top: -40px;
   }
 
   .collapse.navbar-collapse.show {
