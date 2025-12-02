@@ -8,9 +8,6 @@
   <div class="banner-overlay">
     <h1 class="banner-title">BHAGAVAD GITA</h1>
   </div>
-  <div class="banner-decoration">
-    <img src="/gita_open.png" alt="Open Gita" class="gita-book" />
-  </div>
 </section>
 
 <style>
@@ -80,20 +77,6 @@
     line-height: 28.44px;
     position: relative;
     z-index: 2;
-  }
-
-  .banner-decoration {
-    position: absolute;
-    bottom: -20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 2;
-  }
-
-  .gita-book {
-    height: 100px;
-    width: auto;
-    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   }
 
   @media (max-width: 1024px) {

@@ -197,8 +197,8 @@
     text-decoration: none;
     flex-shrink: 0;
     position: absolute;
-    left: 1px;
-    top: -5px;
+    left: 17px;
+    top: 4px;
   }
 
   .navbar-brand img {
@@ -266,15 +266,15 @@
   .nav-link {
     display: block;
     padding: 0.5rem 1rem;
-    color: #333333;
+    color: #694f4fff;
     text-decoration: none;
     transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out;
     border: none;
     background: none;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.8125rem;
-    font-weight: 600;
+    font-size: 0.7400rem;
+    font-weight: 100;
     letter-spacing: 0.5px;
     text-transform: uppercase;
   }

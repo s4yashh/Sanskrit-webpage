@@ -18,7 +18,11 @@
 </script>
 
 <section class="chapters-section">
+  <div class="book-image-container">
+    <img src="/images/gita_open.png" alt="Open Gita Book" class="book-image" />
+  </div>
   <h2 class="section-title">GITA CHAPTERS</h2>
+  <div class="title-divider"></div>
   
   <div class="chapters-grid">
     {#each chapters as chapter (chapter.id)}
@@ -54,8 +58,21 @@
 <style>
   .chapters-section {
     background-color: #f5f1e8;
-    padding: 80px 40px;
+    padding: 40px 40px 80px 40px;
     text-align: center;
+  }
+
+  .book-image-container {
+    margin-bottom: 30px;
+    margin-top: -160px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .book-image {
+    height: 200px;
+    width: auto;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
   }
 
   .section-title {
@@ -63,12 +80,17 @@
     font-weight: 600;
     color: #c41e3a;
     letter-spacing: 2px;
-    margin: 0 0 60px 0;
+    margin: 20px 0 15px 0;
     text-transform: uppercase;
-    border-bottom: 3px solid #c41e3a;
-    padding-bottom: 15px;
     display: inline-block;
     font-family: 'Georgia', serif;
+  }
+
+  .title-divider {
+    height: 3px;
+    width: 500px;
+    background-color: #c41e3a;
+    margin: 0 auto 60px auto;
   }
 
   .chapters-grid {
