@@ -3,12 +3,14 @@
   import HeroBanner from './lib/HeroBanner.svelte'
   import GitaIntro from './lib/GitaIntro.svelte'
   import GitaChapters from './lib/GitaChapters.svelte'
+  import Footer from './lib/Footer.svelte'
 </script>
 
 <Header />
 <HeroBanner />
 <GitaIntro />
 <GitaChapters />
+<Footer />
 
 <style>
   :global(body) {
