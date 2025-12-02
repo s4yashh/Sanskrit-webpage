@@ -23,7 +23,7 @@
 
     <div class="logo-section">
       <img src="/src/assets/footer.png" alt="Logo" class="footer-logo" />
-      <h1 class="brand-title">WELLBEING-SVASTI</h1>
+      <h1 class="brand-title">WELLBEING~SVASTI</h1>
     </div>
 
     <div class="copyright-section">
@@ -34,6 +34,16 @@
 </footer>
 
 <style>
+  @font-face {
+    font-family: 'Edensor';
+    src: url('/src/assets/Edensor-FREE.otf') format('opentype');
+  }
+
+  @font-face {
+    font-family: 'Lato';
+    src: url('/src/assets/Bangers,Inter,Lato,Lexend_Deca,Montserrat,etc/Lato/Lato-Regular.ttf') format('truetype');
+  }
+
   .footer {
     background-color: #3D4C36;
     padding: 0px 20px;
@@ -58,12 +68,12 @@
   }
 
   .connect-text {
-    font-size: 16px;
+    font-size: 24px;
     font-weight: 400;
     letter-spacing: 1px;
     margin: 0;
     color: #d4c4a0;
-    font-family: 'Georgia', serif;
+    font-family: 'Edensor', serif;
   }
 
   .social-icons {
@@ -108,17 +118,17 @@
   .footer-logo {
     height: 80px;
     width: auto;
-    margin-bottom: 10px;
+    margin-bottom: 1px;
     display: block;
   }
 
   .brand-title {
-    font-size: 20px;
+    font-size: 40px;
     font-weight: 400;
     letter-spacing: 2px;
     margin: 5px 0 0 0;
-    color: #d4c4a0;
-    font-family: 'Georgia', serif;
+    color: #AEA17E;
+    font-family: 'Edensor', serif;
     text-transform: uppercase;
   }
 
@@ -130,21 +140,21 @@
   }
 
   .copyright-text {
-    font-size: 13px;
+    font-size: 16px;
     font-weight: 300;
     letter-spacing: 0.5px;
     margin: 0;
-    color: #c5b89e;
-    font-family: 'Georgia', serif;
+    color: #CACACA;
+    font-family: 'Lato', sans-serif;
   }
 
   .developer-credit {
-    font-size: 13px;
+    font-size: 18px;
     font-weight: 300;
     letter-spacing: 0.5px;
     margin: 0;
-    color: #8fa882;
-    font-family: 'Georgia', serif;
+    color: #68B4A9;
+    font-family: 'Lato', sans-serif;
   }
 
   @media (max-width: 768px) {
