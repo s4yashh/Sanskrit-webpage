@@ -5,9 +5,6 @@
   <div class="banner-background">
     <img src="/projector_black.png" alt="Krishna and Arjuna" class="banner-image" />
   </div>
-  <div class="banner-overlay">
-    <h1 class="banner-title">BHAGAVAD GITA</h1>
-  </div>
 </section>
 
 <style>
@@ -45,38 +42,6 @@
 
   .banner-image {
     display: none;
-  }
-
-  .banner-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      to right,
-      rgba(102, 90, 70, 0.3) 0%,
-      rgba(102, 90, 70, 0.2) 50%,
-      rgba(102, 90, 70, 0.3) 100%
-    );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-  }
-
-  .banner-title {
-    font-size: 72px;
-    font-weight: 400;
-    color: rgb(62, 73, 57);
-    letter-spacing: 8px;
-    text-align: center;
-    margin: 0;
-    font-family: Lato, "Noto Sans Devanagari", sans-serif;
-    text-shadow: none;
-    line-height: 28.44px;
-    position: relative;
-    z-index: 2;
   }
 
   @media (max-width: 1024px) {

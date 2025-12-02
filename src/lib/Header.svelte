@@ -165,10 +165,9 @@
 <style>
   .navbar {
     background-color: #f8f9fa;
-    padding: 3.0rem 0;
+    padding: 4.5rem 0;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
+    position: relative;
     z-index: 100;
   }
 

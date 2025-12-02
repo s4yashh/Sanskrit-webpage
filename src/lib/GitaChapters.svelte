@@ -12,6 +12,18 @@
     { id: 4, title: 'Chapter 4', description: 'Jnana Yoga' },
     { id: 5, title: 'Chapter 5', description: 'Sannyasa Yoga' },
     { id: 6, title: 'Chapter 6', description: 'Dhyana Yoga' },
+    { id: 7, title: 'Chapter 7', description: 'Jnana Vijnana Yoga' },
+    { id: 8, title: 'Chapter 8', description: 'Aksara Brahma Yoga' },
+    { id: 9, title: 'Chapter 9', description: 'Raja Vidya Yoga' },
+    { id: 10, title: 'Chapter 10', description: 'Vibhuti Yoga' },
+    { id: 11, title: 'Chapter 11', description: 'Visvarupa Darsana Yoga' },
+    { id: 12, title: 'Chapter 12', description: 'Bhakti Yoga' },
+    { id: 13, title: 'Chapter 13', description: 'Kshetra Kshetrajna Yoga' },
+    { id: 14, title: 'Chapter 14', description: 'Gunatraya Vibhaga Yoga' },
+    { id: 15, title: 'Chapter 15', description: 'Purushottama Yoga' },
+    { id: 16, title: 'Chapter 16', description: 'Daivasura Sampad Yoga' },
+    { id: 17, title: 'Chapter 17', description: 'Shraddhatraya Vibhaga Yoga' },
+    { id: 18, title: 'Chapter 18', description: 'Moksha Sannyasa Yoga' },
   ];
 
   let hoveredChapter: number | null = null;
@@ -40,7 +52,7 @@
       >
         <div class="chapter-card-inner">
           <div class="chapter-image-wrapper">
-            <img src="/gita_book.jpg" alt={`Chapter ${chapter.id}`} class="chapter-image" />
+            <img src="/images/gita_book.jpg" alt={`Chapter ${chapter.id}`} class="chapter-image" />
           </div>
           <div class="chapter-number">{chapter.id}</div>
         </div>
@@ -56,15 +68,19 @@
 </section>
 
 <style>
+  @font-face {
+    font-family: 'Lato';
+    src: url('/src/assets/Bangers,Inter,Lato,Lexend_Deca,Montserrat,etc/Lato/Lato-Regular.ttf') format('truetype');
+  }
+
   .chapters-section {
-    background-color: #f5f1e8;
+    background: linear-gradient(135deg, #D4C4A0 0%, #E9DCB7 50%, #F0EDD7 100%);
     padding: 40px 40px 80px 40px;
     text-align: center;
   }
 
   .book-image-container {
-    margin-bottom: 30px;
-    margin-top: -160px;
+    margin-bottom: -10px;
     display: flex;
     justify-content: center;
   }
@@ -73,6 +89,7 @@
     height: 200px;
     width: auto;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    margin-top: -155px;
   }
 
   .section-title {
@@ -83,22 +100,22 @@
     margin: 20px 0 15px 0;
     text-transform: uppercase;
     display: inline-block;
-    font-family: 'Georgia', serif;
+    font-family: 'Lato', sans-serif;
   }
 
   .title-divider {
     height: 3px;
-    width: 500px;
+    width: 200px;
     background-color: #c41e3a;
     margin: 0 auto 60px auto;
   }
 
   .chapters-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 40px;
-    max-width: 1000px;
-    margin: 0 auto;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 90px;
+    max-width: 1200px;
+    margin: 0 0 0 80px;
     padding: 0 20px;
   }
 
@@ -136,7 +153,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transform: rotate(-45deg) scale(1.4);
+    transform: rotate(-45deg) scale(1.2);
     transform-origin: center;
   }
 
@@ -178,12 +195,14 @@
     font-size: 14px;
     margin: 0 0 8px 0;
     font-weight: 600;
+    font-family: 'Lato', sans-serif;
   }
 
   .chapter-tooltip p {
     font-size: 12px;
     margin: 0;
     color: #ccc;
+    font-family: 'Lato', sans-serif;
   }
 
   @media (max-width: 768px) {

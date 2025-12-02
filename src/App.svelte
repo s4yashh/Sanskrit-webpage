@@ -1,11 +1,13 @@
 <script lang="ts">
   import Header from './lib/Header.svelte'
   import HeroBanner from './lib/HeroBanner.svelte'
+  import GitaIntro from './lib/GitaIntro.svelte'
   import GitaChapters from './lib/GitaChapters.svelte'
 </script>
 
 <Header />
 <HeroBanner />
+<GitaIntro />
 <GitaChapters />
 
 <style>
