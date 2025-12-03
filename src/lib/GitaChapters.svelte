@@ -93,9 +93,9 @@
   }
 
   .section-title {
-    font-size: 28px;
-    font-weight: 600;
-    color: #c41e3a;
+    font-size: 22px;
+    font-weight: 350;
+    color: #BD003C;
     letter-spacing: 2px;
     margin: 20px 0 15px 0;
     text-transform: uppercase;
@@ -125,13 +125,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 180px;
+    height: 160px;
   }
 
   .chapter-card-inner {
     position: relative;
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     transition: transform 0.3s ease;
   }
 
@@ -163,7 +163,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 48px;
+    font-size: 40px;
     font-weight: bold;
     color: white;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);

@@ -6,17 +6,17 @@
     <div class="connect-section">
       <p class="connect-text">Connect</p>
       <div class="social-icons">
-        <a href="#" class="social-icon facebook" title="Facebook">
-          <i class="fab fa-facebook-f"></i>
+        <a href="https://www.facebook.com/RutgerSanskrit" target="_blank" class="social-icon facebook" title="Facebook">
+          <i class="fa fa-facebook"></i>
         </a>
-        <a href="#" class="social-icon twitter" title="Twitter">
-          <i class="fab fa-twitter"></i>
+        <a href="https://twitter.com/RutgerSanskrit" target="_blank" class="social-icon twitter" title="Twitter">
+          <i class="fa fa-twitter"></i>
         </a>
-        <a href="#" class="social-icon youtube" title="YouTube">
-          <i class="fab fa-youtube"></i>
+        <a href="https://www.youtube.com/c/RutgerSanskrit" target="_blank" class="social-icon youtube" title="YouTube">
+          <i class="fa fa-youtube"></i>
         </a>
-        <a href="#" class="social-icon website" title="Website">
-          <i class="fas fa-link"></i>
+        <a href="https://www.johnscottus.ie/" target="_blank" class="social-icon website" title="Website">
+          <i class="fa fa-globe"></i>
         </a>
       </div>
     </div>
@@ -45,7 +45,10 @@
   }
 
   .footer {
-    background-color: #3D4C36;
+    background-image: url('/src/assets/footerimg.png');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
     padding: 30px 20px 0px 20px;
     text-align: center;
     color: #d4c4a0;
@@ -64,7 +67,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0px;
+    gap: 20px;
+    justify-content: center;
   }
 
   .connect-text {
@@ -72,33 +76,46 @@
     font-weight: 400;
     letter-spacing: 1px;
     margin: 0;
-    color: #d4c4a0;
+    color: #CACACA;
     font-family: 'Edensor', serif;
+    white-space: nowrap;
   }
 
   .social-icons {
     display: flex;
     gap: 15px;
     justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .social-icon i {
+    display: inline-block;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .social-icon {
-    width: 40px;
-    height: 40px;
-    border: 2px solid #d4c4a0;
+    width: 45px;
+    height: 45px;
+    border: 2px solid #ffffff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #d4c4a0;
+    color: #ffffff;
     text-decoration: none;
     transition: all 0.3s ease;
-    font-size: 16px;
+    font-size: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    cursor: pointer;
   }
 
   .social-icon:hover {
-    background-color: #d4c4a0;
-    color: #4a6b5a;
+    background-color: #ffffff;
+    color: #3D4C36;
+    transform: scale(1.1);
   }
 
   .logo-section {

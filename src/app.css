@@ -12,6 +12,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/all.min.css');
+
 * {
   margin: 0;
   padding: 0;
