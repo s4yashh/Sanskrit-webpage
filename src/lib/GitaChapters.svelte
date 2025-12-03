@@ -97,17 +97,17 @@
     font-weight: 350;
     color: #BD003C;
     letter-spacing: 2px;
-    margin: 20px 0 15px 0;
+    margin: 10px 0 0px 0;
     text-transform: uppercase;
     display: inline-block;
     font-family: 'Lato', sans-serif;
   }
 
   .title-divider {
-    height: 3px;
-    width: 200px;
+    height: 2px;
+    width: 270px;
     background-color: #c41e3a;
-    margin: 0 auto 60px auto;
+    margin: 0 auto 90px auto;
   }
 
   .chapters-grid {
@@ -125,13 +125,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 160px;
+    height: 140px;
   }
 
   .chapter-card-inner {
     position: relative;
-    width: 140px;
-    height: 140px;
+    width: 130px;
+    height: 130px;
     transition: transform 0.3s ease;
   }
 
@@ -163,7 +163,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 40px;
+    font-size: 30px;
     font-weight: bold;
     color: white;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
