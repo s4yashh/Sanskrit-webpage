@@ -1,4 +1,5 @@
 <script lang="ts">
+  import footerLogo from '../assets/footer.png';
 </script>
 
 <footer class="footer">
@@ -22,7 +23,7 @@
     </div>
 
     <div class="logo-section">
-      <img src="/src/assets/footer.png" alt="Logo" class="footer-logo" />
+      <img src={footerLogo} alt="Logo" class="footer-logo" />
       <h1 class="brand-title">WELLBEING~SVASTI</h1>
     </div>
 
