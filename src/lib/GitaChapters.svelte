@@ -53,8 +53,8 @@
         <div class="chapter-card-inner">
           <div class="chapter-image-wrapper">
             <img src="/images/gita_book.jpg" alt={`Chapter ${chapter.id}`} class="chapter-image" />
+            <div class="chapter-number">{chapter.id}</div>
           </div>
-          <div class="chapter-number">{chapter.id}</div>
         </div>
         {#if hoveredChapter === chapter.id}
           <div class="chapter-tooltip">
@@ -160,15 +160,20 @@
 
   .chapter-number {
     position: absolute;
+    background-color: #352c2cad;
+    width: 100%;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 30px;
-    font-weight: bold;
+    left: 0;
+    transform: translateY(-50%) rotate(-45deg);
+    font-size: 22px;
+    font-weight: 100;
     color: white;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     z-index: 10;
-    mix-blend-mode: screen;
   }
 
   .chapter-tooltip {
