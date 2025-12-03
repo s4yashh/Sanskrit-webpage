@@ -1,4 +1,6 @@
 <script lang="ts">
+  import searchIcon from '../assets/search.png';
+
   let isMobileMenuOpen = false;
   let openDropdown: string | null = null;
 
@@ -36,7 +38,7 @@
         <!-- Search Icon Image -->
         <li class="nav-item">
           <a class="nav-link search-link" href="/search">
-            <img src="/src/assets/search.png" alt="Search" class="search-img" />
+            <img src={searchIcon} alt="Search" class="search-img" />
           </a>
         </li>
 
