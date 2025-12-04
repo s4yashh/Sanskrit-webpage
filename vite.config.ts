@@ -6,11 +6,11 @@ export default defineConfig({
   plugins: [svelte()],
   server: {
     proxy: {
-      '/gita': {
+      '/api/gita': {
         target: 'https://sanskrit.ie',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/gita/, '/api/geeta.php')
+        rewrite: (path) => path.replace(/^\/api\/gita/, '/api/geeta.php')
       }
     }
   }

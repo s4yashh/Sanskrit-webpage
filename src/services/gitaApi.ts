@@ -6,7 +6,8 @@
 
 import type { Verse, ApiResponse } from '../types/gita';
 
-const API_ENDPOINT = '/gita'; // Local Vite proxy endpoint
+// Use Vercel API proxy for all environments (local dev and production)
+const API_ENDPOINT = '/api/gita';
 
 /**
  * Fetch verses for a specific chapter

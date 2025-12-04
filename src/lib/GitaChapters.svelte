@@ -44,7 +44,7 @@
 
   /**
    * Fetch verses for a specific chapter from the API
-   * Uses local Vite proxy to bypass CORS restrictions
+   * Uses Vercel serverless API proxy to bypass CORS restrictions
    */
   async function fetchVerses(chapterNumber: number) {
     isLoading = true;
@@ -52,16 +52,22 @@
     verses = [];
 
     try {
-      // Use local proxy instead of external corsproxy.io
-      const response = await fetch(`/gita?q=${chapterNumber}`);
+      // Use Vercel API proxy endpoint (/api/gita)
+      const response = await fetch(`/api/gita?q=${chapterNumber}`);
 
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
       }
 
-      // Parse response as text first (server returns HTML content-type)
-      const text = await response.text();
-      const json = JSON.parse(text); // Manually parse JSON
+      // Try parsing as JSON first
+      let json;
+      try {
+        json = await response.json();
+      } catch {
+        // If JSON parsing fails, try parsing as text then JSON
+        const text = await response.text();
+        json = JSON.parse(text);
+      }
 
       // Extract verses array from response
       verses = Array.isArray(json) ? json : json.data || [];
