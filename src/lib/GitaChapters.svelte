@@ -43,6 +43,14 @@
   let error: string | null = null;
 
   /**
+   * Handle back button to return to chapter grid
+   */
+  function handleBackClick() {
+    selectedChapter = null;
+    verses = [];
+  }
+
+  /**
    * Fetch verses for a specific chapter from the API
    * Uses Vercel serverless API proxy to bypass CORS restrictions
    */
@@ -101,78 +109,80 @@
   <div class="book-image-container">
     <img src="/images/gita_open.png" alt="Open Gita Book" class="book-image" />
   </div>
-  <h2 class="section-title">GITA CHAPTERS</h2>
+  <h2 class="section-title">
+    {#if selectedChapter === null}
+      GITA CHAPTERS
+    {:else}
+      CHAPTER {selectedChapter}
+    {/if}
+  </h2>
   <div class="title-divider"></div>
   
-  <div class="chapters-grid">
-    {#each chapters as chapter (chapter.id)}
-      <div
-        class="chapter-card"
-        class:active={selectedChapter === chapter.id}
-        on:mouseenter={() => (hoveredChapter = chapter.id)}
-        on:mouseleave={() => (hoveredChapter = null)}
-        on:click={() => handleChapterClick(chapter.id)}
-        role="button"
-        tabindex="0"
-        on:keydown={(e) => {
-          if (e.key === 'Enter') {
-            handleChapterClick(chapter.id);
-          }
-        }}
-      >
-        <div class="chapter-card-inner">
-          <div class="chapter-image-wrapper">
-            <img src="/images/gita_book.jpg" alt={`Chapter ${chapter.id}`} class="chapter-image" />
-            <div class="chapter-number">{chapter.id}</div>
-          </div>
-        </div>
-        {#if hoveredChapter === chapter.id}
-          <div class="chapter-tooltip">
-            <h3>{chapter.title}</h3>
-            <p>{chapter.description}</p>
-          </div>
-        {/if}
-      </div>
-    {/each}
-  </div>
-
-  <!-- Verses Display Section -->
-  {#if selectedChapter !== null}
-    <div class="verses-section">
-      <h3 class="verses-title">
-        {chapters.find(c => c.id === selectedChapter)?.title}
-        {#if chapters.find(c => c.id === selectedChapter)?.description}
-          <span class="verses-subtitle">— {chapters.find(c => c.id === selectedChapter)?.description}</span>
-        {/if}
-      </h3>
-      
-      {#if isLoading}
-        <div class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading verses...</p>
-        </div>
-      {:else if error}
-        <div class="error-state">
-          <p>{error}</p>
-          <button on:click={() => handleChapterClick(selectedChapter)}>Try Again</button>
-        </div>
-      {:else if verses.length > 0}
-        <div class="verses-list">
-          {#each verses as verse (verse.geeta_id)}
-            <div class="verse-card">
-              <div class="verse-content">
-                <!-- Render the HTML lyrics provided by API -->
-                {#if verse.lyrics}
-                  <div class="verse-lyrics">
-                    {@html verse.lyrics}
-                  </div>
-                {/if}
-              </div>
+  {#if selectedChapter === null}
+    <!-- Show Chapter Grid -->
+    <div class="chapters-grid">
+      {#each chapters as chapter (chapter.id)}
+        <div
+          class="chapter-card"
+          on:mouseenter={() => (hoveredChapter = chapter.id)}
+          on:mouseleave={() => (hoveredChapter = null)}
+          on:click={() => handleChapterClick(chapter.id)}
+          role="button"
+          tabindex="0"
+          on:keydown={(e) => {
+            if (e.key === 'Enter') {
+              handleChapterClick(chapter.id);
+            }
+          }}
+        >
+          <div class="chapter-card-inner">
+            <div class="chapter-image-wrapper">
+              <img src="/images/gita_book.jpg" alt={`Chapter ${chapter.id}`} class="chapter-image" />
+              <div class="chapter-number">{chapter.id}</div>
             </div>
-          {/each}
+          </div>
+          {#if hoveredChapter === chapter.id}
+            <div class="chapter-tooltip">
+              <h3>{chapter.title}</h3>
+              <p>{chapter.description}</p>
+            </div>
+          {/if}
         </div>
-      {/if}
+      {/each}
     </div>
+  {:else}
+    <!-- Show Verses Grid -->
+    <div class="verses-header">
+      <button class="back-btn" on:click={handleBackClick}>&lt; Back</button>
+    </div>
+    
+    {#if isLoading}
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading verses...</p>
+      </div>
+    {:else if error}
+      <div class="error-state">
+        <p>{error}</p>
+        <button on:click={() => handleChapterClick(selectedChapter)}>Try Again</button>
+      </div>
+    {:else if verses.length > 0}
+      <div class="verses-grid">
+        {#each verses as verse, index (verse.geeta_id || index)}
+          <div class="verse-scroll-card">
+            <img src="/images/sletter.png" alt="Verse Scroll" class="verse-scroll-bg" />
+            <div class="verse-scroll-content">
+              <div class="verse-number">{verse.verse || index + 1}</div>
+              <button class="verse-play-btn" title="Play verse">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        {/each}
+      </div>
+    {/if}
   {/if}
 </section>
 
@@ -332,32 +342,43 @@
   }
 
   /* Verses Section Styles */
-  .verses-section {
-    background: #F0E5BE;
-    padding: 60px 40px;
-    margin-top: 60px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    animation: slideIn 0.3s ease;
+  .verses-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 60px;
+    position: relative;
   }
 
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+  .back-btn {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #BD003C;
+    text-decoration: underline;
+    font-size: 16px;
+    cursor: pointer;
+    font-family: 'Lato', sans-serif;
+    transition: color 0.3s ease;
+    padding: 0;
+  }
+
+  .back-btn:hover {
+    color: #9a0030;
   }
 
   .verses-title {
     font-size: 28px;
     font-weight: 600;
-    color: #352c2c;
-    margin: 0 0 10px 0;
+    color: #BD003C;
+    margin: 0;
     font-family: 'Lato', sans-serif;
+    text-align: center;
+    text-decoration: underline;
   }
 
   .verses-subtitle {
@@ -368,6 +389,87 @@
     margin-top: 8px;
     font-style: italic;
     font-family: 'Lato', sans-serif;
+  }
+
+  .verses-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 40px;
+    margin-top: 60px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .verse-scroll-card {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3/4;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .verse-scroll-card:hover {
+    transform: scale(1.05);
+  }
+
+  .verse-scroll-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+
+  .verse-scroll-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    height: 100%;
+    width: 100%;
+  }
+
+  .verse-number {
+    font-size: 48px;
+    font-weight: 300;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'Lato', sans-serif;
+  }
+
+  .verse-play-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid white;
+    color: #BD003C;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .verse-play-btn:hover {
+    background: white;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .verse-play-btn svg {
+    width: 24px;
+    height: 24px;
+    margin-left: 4px;
   }
 
   .loading-state {
@@ -431,97 +533,6 @@
     background: #9a0030;
   }
 
-  .verses-list {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    margin-top: 40px;
-  }
-
-  .verse-card {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .verse-card:hover {
-    transform: translateX(5px);
-    box-shadow: none;
-  }
-
-  .verse-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
-  }
-
-  .verse-text,
-  .verse-transliteration,
-  .verse-meaning {
-    flex: 1;
-  }
-
-  .verse-text h4,
-  .verse-transliteration h4,
-  .verse-meaning h4 {
-    font-size: 14px;
-    font-weight: 600;
-    color: #BD003C;
-    margin: 0 0 10px 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'Lato', sans-serif;
-  }
-
-  .verse-text p,
-  .verse-transliteration p,
-  .verse-meaning p {
-    font-size: 14px;
-    line-height: 1.8;
-    color: #333;
-    margin: 0;
-    font-family: 'Lato', sans-serif;
-    font-style: normal;
-  }
-
-  .verse-text p {
-    font-style: italic;
-    color: #555;
-  }
-
-  .verse-meaning p {
-    color: #444;
-    line-height: 1.9;
-  }
-
-  /* Verse Lyrics (HTML content from API) */
-  .verse-lyrics {
-    flex: 1;
-    font-size: 14px;
-    line-height: 1.8;
-    color: white;
-    font-family: 'Noto Sans', sans-serif;
-    font-weight: 200;
-  }
-
-  .verse-lyrics :global(h4) {
-    font-size: 14px;
-    font-weight: 600;
-    color: white;
-    margin: 0 0 10px 0;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-family: 'Noto Sans', sans-serif;
-  }
-
-  .verse-lyrics :global(p) {
-    margin: 10px 0;
-    color: white;
-  }
-
-  .verse-lyrics :global(em) {
-    font-style: italic;
-    color: white;
-  }
-
   @media (max-width: 768px) {
     .chapters-section {
       padding: 60px 20px;
@@ -562,18 +573,35 @@
       font-size: 14px;
     }
 
-    .verse-content {
-      grid-template-columns: 1fr;
+    .verses-grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 40px;
     }
 
-    .verse-card {
-      padding: 20px;
+    .verse-number {
+      font-size: 32px;
     }
 
-    .verse-text p,
-    .verse-transliteration p,
-    .verse-meaning p {
-      font-size: 13px;
+    .verse-play-btn {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .verses-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .verse-number {
+      font-size: 28px;
+    }
+
+    .verse-play-btn {
+      width: 42px;
+      height: 42px;
     }
   }
 </style>
