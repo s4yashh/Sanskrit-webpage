@@ -5,6 +5,7 @@
     id: number;
     title: string;
     description: string;
+    verseCount: number;
   }
 
   interface Verse {
@@ -16,24 +17,24 @@
   }
 
   const chapters: Chapter[] = [
-    { id: 1, title: 'Chapter 1', description: 'Arjuna Vishada Yoga' },
-    { id: 2, title: 'Chapter 2', description: 'Sankhya Yoga' },
-    { id: 3, title: 'Chapter 3', description: 'Karma Yoga' },
-    { id: 4, title: 'Chapter 4', description: 'Jnana Yoga' },
-    { id: 5, title: 'Chapter 5', description: 'Sannyasa Yoga' },
-    { id: 6, title: 'Chapter 6', description: 'Dhyana Yoga' },
-    { id: 7, title: 'Chapter 7', description: 'Jnana Vijnana Yoga' },
-    { id: 8, title: 'Chapter 8', description: 'Aksara Brahma Yoga' },
-    { id: 9, title: 'Chapter 9', description: 'Raja Vidya Yoga' },
-    { id: 10, title: 'Chapter 10', description: 'Vibhuti Yoga' },
-    { id: 11, title: 'Chapter 11', description: 'Visvarupa Darsana Yoga' },
-    { id: 12, title: 'Chapter 12', description: 'Bhakti Yoga' },
-    { id: 13, title: 'Chapter 13', description: 'Kshetra Kshetrajna Yoga' },
-    { id: 14, title: 'Chapter 14', description: 'Gunatraya Vibhaga Yoga' },
-    { id: 15, title: 'Chapter 15', description: 'Purushottama Yoga' },
-    { id: 16, title: 'Chapter 16', description: 'Daivasura Sampad Yoga' },
-    { id: 17, title: 'Chapter 17', description: 'Shraddhatraya Vibhaga Yoga' },
-    { id: 18, title: 'Chapter 18', description: 'Moksha Sannyasa Yoga' },
+    { id: 1, title: 'Chapter 1', description: 'Arjuna Vishada Yoga', verseCount: 47 },
+    { id: 2, title: 'Chapter 2', description: 'Sankhya Yoga', verseCount: 72 },
+    { id: 3, title: 'Chapter 3', description: 'Karma Yoga', verseCount: 43 },
+    { id: 4, title: 'Chapter 4', description: 'Jnana Yoga', verseCount: 42 },
+    { id: 5, title: 'Chapter 5', description: 'Sannyasa Yoga', verseCount: 29 },
+    { id: 6, title: 'Chapter 6', description: 'Dhyana Yoga', verseCount: 47 },
+    { id: 7, title: 'Chapter 7', description: 'Jnana Vijnana Yoga', verseCount: 30 },
+    { id: 8, title: 'Chapter 8', description: 'Aksara Brahma Yoga', verseCount: 28 },
+    { id: 9, title: 'Chapter 9', description: 'Raja Vidya Yoga', verseCount: 34 },
+    { id: 10, title: 'Chapter 10', description: 'Vibhuti Yoga', verseCount: 42 },
+    { id: 11, title: 'Chapter 11', description: 'Visvarupa Darsana Yoga', verseCount: 55 },
+    { id: 12, title: 'Chapter 12', description: 'Bhakti Yoga', verseCount: 20 },
+    { id: 13, title: 'Chapter 13', description: 'Kshetra Kshetrajna Yoga', verseCount: 35 },
+    { id: 14, title: 'Chapter 14', description: 'Gunatraya Vibhaga Yoga', verseCount: 27 },
+    { id: 15, title: 'Chapter 15', description: 'Purushottama Yoga', verseCount: 20 },
+    { id: 16, title: 'Chapter 16', description: 'Daivasura Sampad Yoga', verseCount: 24 },
+    { id: 17, title: 'Chapter 17', description: 'Shraddhatraya Vibhaga Yoga', verseCount: 28 },
+    { id: 18, title: 'Chapter 18', description: 'Moksha Sannyasa Yoga', verseCount: 78 },
   ];
 
   let hoveredChapter: number | null = null;
@@ -41,6 +42,11 @@
   let verses: any[] = [];
   let isLoading = false;
   let error: string | null = null;
+  let selectedVerse: any | null = null; // Currently selected verse for modal
+  let showWholeChapter = false; // Flag for whole chapter modal
+  let wholeChapterIntro: string = ''; // Chapter introduction text
+  let versesCache: Map<number, any[]> = new Map(); // Cache for preloaded verses
+  let introCache: Map<number, string> = new Map(); // Cache for chapter introductions
 
   /**
    * Handle back button to return to chapter grid
@@ -48,6 +54,78 @@
   function handleBackClick() {
     selectedChapter = null;
     verses = [];
+    selectedVerse = null;
+    showWholeChapter = false;
+  }
+
+  /**
+   * Open verse modal
+   */
+  function openVerseModal(verse: any) {
+    selectedVerse = verse;
+    showWholeChapter = false;
+  }
+
+  /**
+   * Fetch chapter introduction from first verse
+   * Extract only the intro part (before footnotes) from verse 0
+   */
+  async function fetchChapterIntro(chapterNumber: number) {
+    // Check cache first
+    if (introCache.has(chapterNumber)) {
+      wholeChapterIntro = introCache.get(chapterNumber) || '';
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/gita?q=${chapterNumber}`);
+      if (!response.ok) throw new Error('Failed to fetch intro');
+      
+      const json = await response.json();
+      let fetchedVerses = json.data || json.verses || json;
+      
+      if (Array.isArray(fetchedVerses) && fetchedVerses.length > 0) {
+        // Get the first verse which contains chapter intro
+        const firstVerse = fetchedVerses[0];
+        let introText = firstVerse.lyrics || '';
+        
+        // Extract only the intro part (before the first footnote [1])
+        // The footnotes start with [1], [2], etc.
+        const footnoteMatch = introText.match(/\[\d+\]/);
+        if (footnoteMatch) {
+          // Get content before the footnote
+          const beforeFootnote = introText.substring(0, footnoteMatch.index);
+          // Add the footnotes back (everything from first footnote onwards)
+          const footnotesStart = introText.substring(footnoteMatch.index);
+          introText = beforeFootnote + '\n\n' + footnotesStart;
+        }
+        
+        wholeChapterIntro = introText;
+        introCache.set(chapterNumber, introText);
+      }
+    } catch (err) {
+      console.error('Error fetching intro:', err);
+      wholeChapterIntro = '';
+    }
+  }
+
+  /**
+   * Open whole chapter modal
+   */
+  async function openWholeChapterModal() {
+    showWholeChapter = true;
+    selectedVerse = null;
+    if (selectedChapter) {
+      await fetchChapterIntro(selectedChapter);
+    }
+  }
+
+  /**
+   * Close all modals
+   */
+  function closeModal() {
+    selectedVerse = null;
+    showWholeChapter = false;
   }
 
   /**
@@ -55,9 +133,18 @@
    * Uses Vercel serverless API proxy to bypass CORS restrictions
    */
   async function fetchVerses(chapterNumber: number) {
+    // Check cache first - but only if it has verses with shlok_no > 0
+    if (versesCache.has(chapterNumber)) {
+      const cachedVerses = versesCache.get(chapterNumber) || [];
+      // Make sure cached verses don't have verse 0 (we only store numbered verses)
+      if (cachedVerses.length > 0 && cachedVerses[0].shlok_no !== 0) {
+        verses = cachedVerses;
+        return;
+      }
+    }
+
     isLoading = true;
     error = null;
-    verses = [];
 
     try {
       // Use Vercel API proxy endpoint (/api/gita)
@@ -77,8 +164,37 @@
         json = JSON.parse(text);
       }
 
-      // Extract verses array from response
-      verses = Array.isArray(json) ? json : json.data || [];
+      console.log('API Response:', json);
+
+      // Extract verses array from response - API returns {status, message, data, error}
+      let fetchedVerses = [];
+      
+      if (Array.isArray(json)) {
+        fetchedVerses = json;
+      } else if (json.data && Array.isArray(json.data)) {
+        fetchedVerses = json.data;
+      } else if (json.verses && Array.isArray(json.verses)) {
+        fetchedVerses = json.verses;
+      }
+
+      console.log('Extracted verses:', fetchedVerses);
+      if (fetchedVerses.length > 0) {
+        console.log('First verse object:', fetchedVerses[0]);
+      }
+
+      // Limit verses FIRST to verseCount + 1 (to account for verse 0)
+      const currentChapter = chapters.find(ch => ch.id === chapterNumber);
+      if (currentChapter && currentChapter.verseCount) {
+        // Get verseCount + 1 to include verse 0 (which we'll filter out later)
+        fetchedVerses = fetchedVerses.slice(0, currentChapter.verseCount + 1);
+      }
+
+      // Filter out verse 0 (introduction verse, not numbered) for display
+      fetchedVerses = fetchedVerses.filter((verse: any) => verse.shlok_no !== 0 && verse.shlok_no !== null && verse.shlok_no !== undefined);
+
+      // Store in cache AFTER filtering
+      versesCache.set(chapterNumber, fetchedVerses);
+      verses = fetchedVerses;
 
       if (verses.length === 0) {
         error = 'No verses found for this chapter';
@@ -96,12 +212,23 @@
    */
   function handleChapterClick(chapterId: number) {
     selectedChapter = chapterId;
+    // Don't show loading state, fetch verses in background
     fetchVerses(chapterId);
   }
 
   onMount(() => {
-    // Load Chapter 1 verses by default when component mounts
-    fetchVerses(1);
+    // Clear old caches to ensure no verse 0 data is used
+    versesCache.clear();
+    introCache.clear();
+    
+    // Preload Chapter 1 immediately for smooth initial load
+    fetchVerses(1).then(() => {
+      // Preload other chapters in background
+      for (let i = 2; i <= 18; i++) {
+        fetchVerses(i);
+      }
+    });
+    selectedChapter = null;
   });
 </script>
 
@@ -167,24 +294,85 @@
         <button on:click={() => handleChapterClick(selectedChapter)}>Try Again</button>
       </div>
     {:else if verses.length > 0}
-      <div class="verses-grid">
-        {#each verses as verse, index (verse.geeta_id || index)}
-          <div class="verse-scroll-card">
-            <img src="/images/sletter.png" alt="Verse Scroll" class="verse-scroll-bg" />
+      <div class="chapter-content">
+        <div class="verses-grid">
+          <!-- Whole Chapter Card -->
+          <div class="verse-scroll-card" on:click={openWholeChapterModal}>
+            <img src="/images/sletter.png" alt="Whole Chapter" class="verse-scroll-bg" />
             <div class="verse-scroll-content">
-              <div class="verse-number">{verse.verse || index + 1}</div>
-              <button class="verse-play-btn" title="Play verse">
+              <div class="whole-chapter-text">Whole<br/>Chapter</div>
+              <button class="verse-play-btn" title="Show chapter content" on:click|stopPropagation={openWholeChapterModal}>
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </button>
             </div>
           </div>
-        {/each}
+
+          <!-- Individual Verse Cards -->
+          {#each verses.filter((v) => v.shlok_no > 0) as verse, index (verse.geeta_id || index)}
+            <div class="verse-scroll-card" on:click={() => openVerseModal(verse)}>
+              <img src="/images/sletter.png" alt={`Verse ${verse.shlok_no}`} class="verse-scroll-bg" />
+              <div class="verse-scroll-content">
+                <div class="verse-number">{verse.shlok_no || index + 1}</div>
+                <button class="verse-play-btn" title="Show verse content" on:click|stopPropagation={() => openVerseModal(verse)}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          {/each}
+
+          <!-- End of Chapter Card -->
+          <div class="verse-scroll-card">
+            <img src="/images/sletter.png" alt="End of Chapter" class="verse-scroll-bg" />
+            <div class="verse-scroll-content">
+              <div class="whole-chapter-text">End of<br/>Chapter</div>
+            </div>
+          </div>
+        </div>
       </div>
     {/if}
   {/if}
 </section>
+
+<!-- Modals rendered outside the main section -->
+{#if showWholeChapter}
+  <div class="modal-backdrop" on:click={closeModal}>
+    <div class="modal-container whole-chapter-modal" on:click|stopPropagation>
+      <button class="modal-close-btn" on:click={closeModal}>✕</button>
+      <div class="modal-content">
+        <div class="chapter-header-content">
+          <h2 class="chapter-number-roman">{selectedChapter === 1 ? 'I' : selectedChapter === 2 ? 'II' : selectedChapter === 3 ? 'III' : selectedChapter === 4 ? 'IV' : selectedChapter === 5 ? 'V' : selectedChapter === 6 ? 'VI' : selectedChapter === 7 ? 'VII' : selectedChapter === 8 ? 'VIII' : selectedChapter === 9 ? 'IX' : selectedChapter === 10 ? 'X' : selectedChapter === 11 ? 'XI' : selectedChapter === 12 ? 'XII' : selectedChapter === 13 ? 'XIII' : selectedChapter === 14 ? 'XIV' : selectedChapter === 15 ? 'XV' : selectedChapter === 16 ? 'XVI' : selectedChapter === 17 ? 'XVII' : 'XVIII'}</h2>
+          <h3 class="chapter-description">{chapters.find(ch => ch.id === selectedChapter)?.description || ''}</h3>
+        </div>
+        <div class="whole-chapter-content">
+          {#if wholeChapterIntro}
+            <div class="chapter-intro">
+              {@html wholeChapterIntro}
+            </div>
+          {/if}
+        </div>
+      </div>
+    </div>
+  </div>
+{/if}
+
+{#if selectedVerse}
+  <div class="modal-backdrop" on:click={closeModal}>
+    <div class="modal-container verse-modal" on:click|stopPropagation>
+      <button class="modal-close-btn" on:click={closeModal}>✕</button>
+      <div class="modal-content">
+        {#if selectedVerse.lyrics}
+          <div class="verse-lyrics">
+            {@html selectedVerse.lyrics}
+          </div>
+        {/if}
+      </div>
+    </div>
+  </div>
+{/if}
 
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@200;400;600&display=swap');
@@ -391,14 +579,36 @@
     font-family: 'Lato', sans-serif;
   }
 
+  /* Chapter Content Styles */
+  .chapter-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+
+  .chapter-label {
+    font-size: 20px;
+    font-weight: 400;
+    color: #BD003C;
+    text-transform: lowercase;
+    font-family: 'Lato', sans-serif;
+    margin-bottom: 40px;
+    letter-spacing: 1px;
+  }
+
+  .chapter-label.end-label {
+    margin-top: 60px;
+    margin-bottom: 0;
+    text-align: center;
+  }
+
   .verses-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 40px;
+    gap: 90px;
     margin-top: 60px;
-    max-width: 1400px;
-    margin-left: auto;
-    margin-right: auto;
+    max-width: 100%;
+    padding: 0 40px;
   }
 
   .verse-scroll-card {
@@ -421,8 +631,6 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
 
   .verse-scroll-content {
@@ -443,6 +651,16 @@
     color: #fff;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     font-family: 'Lato', sans-serif;
+  }
+
+  .whole-chapter-text {
+    font-size: 32px;
+    font-weight: 300;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    font-family: 'Lato', sans-serif;
+    text-align: center;
+    line-height: 1.4;
   }
 
   .verse-play-btn {
@@ -470,6 +688,250 @@
     width: 24px;
     height: 24px;
     margin-left: 4px;
+  }
+
+  /* Whole Chapter Content */
+  .whole-chapter-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: justify;
+  }
+
+  .chapter-verse-text {
+    margin: 0 0 10px 0;
+    color: #333;
+    font-size: 15px;
+    line-height: 1.9;
+    font-family: 'Lato', sans-serif;
+  }
+
+  /* Modal Styles */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+  }
+
+  .modal-container {
+    background: #F0E8D8;
+    border-radius: 20px;
+    padding: 50px 60px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    position: relative;
+  }
+
+  .whole-chapter-modal {
+    width: 95%;
+    max-width: 1100px;
+    background: #FAD4B3;
+  }
+
+  .verse-modal {
+    width: 85%;
+    max-width: 800px;
+    background: #FAD4B3;
+  }
+
+  .modal-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    color: #333;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2001;
+    transition: background 0.2s ease;
+  }
+
+  .modal-close-btn:hover {
+    background: rgba(189, 0, 60, 0.1);
+  }
+
+  .modal-content {
+    position: relative;
+  }
+
+  .verse-text-display {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+  }
+
+  .verse-lyrics {
+    font-family: 'Lato', sans-serif;
+    color: #333;
+    line-height: 1.8;
+  }
+
+  .verse-lyrics :global(p) {
+    margin: 15px 0;
+    font-size: 15px;
+  }
+
+  .verse-lyrics :global(strong) {
+    font-weight: 600;
+  }
+
+  .verse-lyrics :global(span.text-huge) {
+    font-size: 24px !important;
+    display: block;
+    margin: 10px 0;
+  }
+
+  .whole-chapter-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 20px 10px;
+  }
+
+  .chapter-intro {
+    font-family: 'Lato', sans-serif;
+    color: #333;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .chapter-intro :global(p) {
+    margin: 15px 0;
+  }
+
+  .chapter-intro :global(strong) {
+    font-weight: 600;
+  }
+
+  .chapter-intro :global(span.text-huge) {
+    font-size: 24px !important;
+    display: block;
+    margin: 15px 0 10px 0;
+    font-weight: 600;
+  }
+
+  .whole-chapter-verse {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    line-height: 1.8;
+  }
+
+  .verse-ref {
+    font-weight: 600;
+    color: #BD003C;
+    flex-shrink: 0;
+    min-width: 30px;
+  }
+
+  .verse-lyrics-whole {
+    font-family: 'Lato', sans-serif;
+    color: #333;
+    font-size: 15px;
+    flex: 1;
+  }
+
+  .verse-lyrics-whole :global(p) {
+    margin: 0;
+    display: inline;
+  }
+
+  .verse-lyrics-whole :global(span.text-huge) {
+    font-size: 24px !important;
+    display: block;
+    margin: 15px 0 10px 0;
+    font-weight: 600;
+  }
+
+  .sanskrit-text {
+    font-size: 20px;
+    line-height: 1.8;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: #BD003C;
+    font-weight: 500;
+  }
+
+  .transliteration-text {
+    font-size: 18px;
+    line-height: 1.8;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    font-style: italic;
+    color: #4A90E2;
+  }
+
+  .meaning-text {
+    font-size: 16px;
+    line-height: 1.9;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: #333;
+    text-align: justify;
+  }
+
+  .debug-verse {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .debug-property {
+    text-align: left;
+  }
+
+  .debug-property strong {
+    font-size: 14px;
+    color: #BD003C;
+    text-transform: uppercase;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .debug-property p {
+    font-size: 15px;
+    line-height: 1.8;
+    margin: 10px 0 0 0;
+    color: #333;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .chapter-header-content {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #D4AF37;
+  }
+
+  .chapter-number-roman {
+    font-size: 56px;
+    font-weight: 400;
+    color: #333;
+    margin: 0 0 15px 0;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 2px;
+  }
+
+  .chapter-description {
+    font-size: 20px;
+    font-weight: 400;
+    color: #333;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
   }
 
   .loading-state {
