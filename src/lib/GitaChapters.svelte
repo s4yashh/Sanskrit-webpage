@@ -133,16 +133,11 @@
    * Uses Vercel serverless API proxy to bypass CORS restrictions
    */
   async function fetchVerses(chapterNumber: number) {
-    // Check cache first - but only if it has verses with shlok_no > 0
-    if (versesCache.has(chapterNumber)) {
-      const cachedVerses = versesCache.get(chapterNumber) || [];
-      // Make sure cached verses don't have verse 0 (we only store numbered verses)
-      if (cachedVerses.length > 0 && cachedVerses[0].shlok_no !== 0) {
-        verses = cachedVerses;
-        return;
-      }
-    }
+    // Get the expected verse count for this chapter
+    const currentChapter = chapters.find(ch => ch.id === chapterNumber);
+    const expectedCount = currentChapter?.verseCount || 0;
 
+    // Skip cache - always fetch fresh to avoid API inconsistency issues
     isLoading = true;
     error = null;
 
@@ -177,22 +172,38 @@
         fetchedVerses = json.verses;
       }
 
-      console.log('Extracted verses:', fetchedVerses);
-      if (fetchedVerses.length > 0) {
-        console.log('First verse object:', fetchedVerses[0]);
-      }
+      console.log('Extracted verses before filtering:', fetchedVerses.length);
 
-      // Limit verses FIRST to verseCount + 1 (to account for verse 0)
-      const currentChapter = chapters.find(ch => ch.id === chapterNumber);
-      if (currentChapter && currentChapter.verseCount) {
-        // Get verseCount + 1 to include verse 0 (which we'll filter out later)
-        fetchedVerses = fetchedVerses.slice(0, currentChapter.verseCount + 1);
+      // CRITICAL: Limit to expected count BEFORE filtering verse 0
+      if (expectedCount > 0) {
+        // Slice to get expectedCount + 1 verses (including verse 0)
+        fetchedVerses = fetchedVerses.slice(0, expectedCount + 1);
+        console.log('After slicing to', expectedCount + 1, ':', fetchedVerses.length);
       }
 
       // Filter out verse 0 (introduction verse, not numbered) for display
-      fetchedVerses = fetchedVerses.filter((verse: any) => verse.shlok_no !== 0 && verse.shlok_no !== null && verse.shlok_no !== undefined);
+      console.log('First verse shlok_no:', fetchedVerses[0]?.shlok_no);
+      console.log('All shlok_no values:', fetchedVerses.map((v: any) => v.shlok_no));
+      
+      fetchedVerses = fetchedVerses.filter((verse: any) => {
+        const isValid = verse.shlok_no !== 0 && verse.shlok_no !== null && verse.shlok_no !== undefined;
+        return isValid;
+      });
 
-      // Store in cache AFTER filtering
+      console.log('After filtering verse 0:', fetchedVerses.length, 'Expected:', expectedCount);
+      
+      // Now slice to exact expected count
+      if (fetchedVerses.length > expectedCount) {
+        fetchedVerses = fetchedVerses.slice(0, expectedCount);
+        console.log('After final slice:', fetchedVerses.length);
+      }
+      
+      // Verify we have the correct count
+      if (fetchedVerses.length !== expectedCount) {
+        console.warn(`WARNING: Got ${fetchedVerses.length} verses but expected ${expectedCount}`);
+      }
+
+      // Store in cache AFTER filtering and validation
       versesCache.set(chapterNumber, fetchedVerses);
       verses = fetchedVerses;
 
@@ -765,6 +776,12 @@
     position: relative;
   }
 
+  .verse-modal .modal-content {
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 20px 10px;
+  }
+
   .verse-text-display {
     text-align: center;
     display: flex;
@@ -776,11 +793,13 @@
     font-family: 'Lato', sans-serif;
     color: #333;
     line-height: 1.8;
+    text-align: center;
   }
 
   .verse-lyrics :global(p) {
     margin: 15px 0;
     font-size: 15px;
+    text-align: center;
   }
 
   .verse-lyrics :global(strong) {
