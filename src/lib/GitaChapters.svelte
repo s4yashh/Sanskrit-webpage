@@ -343,10 +343,6 @@
     <div class="modal-container whole-chapter-modal" on:click|stopPropagation>
       <button class="modal-close-btn" on:click={closeModal}>✕</button>
       <div class="modal-content">
-        <div class="chapter-header-content">
-          <h2 class="chapter-number-roman">{selectedChapter === 1 ? 'I' : selectedChapter === 2 ? 'II' : selectedChapter === 3 ? 'III' : selectedChapter === 4 ? 'IV' : selectedChapter === 5 ? 'V' : selectedChapter === 6 ? 'VI' : selectedChapter === 7 ? 'VII' : selectedChapter === 8 ? 'VIII' : selectedChapter === 9 ? 'IX' : selectedChapter === 10 ? 'X' : selectedChapter === 11 ? 'XI' : selectedChapter === 12 ? 'XII' : selectedChapter === 13 ? 'XIII' : selectedChapter === 14 ? 'XIV' : selectedChapter === 15 ? 'XV' : selectedChapter === 16 ? 'XVI' : selectedChapter === 17 ? 'XVII' : 'XVIII'}</h2>
-          <h3 class="chapter-description">{chapters.find(ch => ch.id === selectedChapter)?.description || ''}</h3>
-        </div>
         <div class="whole-chapter-content">
           {#if wholeChapterIntro}
             <div class="chapter-intro">
