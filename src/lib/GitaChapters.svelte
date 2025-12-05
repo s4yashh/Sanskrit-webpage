@@ -45,6 +45,8 @@
   let selectedVerse: any | null = null; // Currently selected verse for modal
   let showWholeChapter = false; // Flag for whole chapter modal
   let wholeChapterIntro: string = ''; // Chapter introduction text
+  let endOfChapterText: string = ''; // Chapter ending text (Om tatsaditi verse)
+  let showingEndOfChapter = false; // Flag to track which content to show
   let versesCache: Map<number, any[]> = new Map(); // Cache for preloaded verses
   let introCache: Map<number, string> = new Map(); // Cache for chapter introductions
 
@@ -74,6 +76,7 @@
     // Check cache first
     if (introCache.has(chapterNumber)) {
       wholeChapterIntro = introCache.get(chapterNumber) || '';
+      console.log('Using cached intro for chapter', chapterNumber);
       return;
     }
 
@@ -82,12 +85,14 @@
       if (!response.ok) throw new Error('Failed to fetch intro');
       
       const json = await response.json();
-      let fetchedVerses = json.data || json.verses || json;
+      let fetchedVerses = normalizeApiResponse(json);
       
       if (Array.isArray(fetchedVerses) && fetchedVerses.length > 0) {
         // Get the first verse which contains chapter intro
         const firstVerse = fetchedVerses[0];
         let introText = firstVerse.lyrics || '';
+        
+        console.log('Fetched intro for chapter', chapterNumber, '- length:', introText.length);
         
         // Extract only the intro part (before the first footnote [1])
         // The footnotes start with [1], [2], etc.
@@ -104,7 +109,7 @@
         introCache.set(chapterNumber, introText);
       }
     } catch (err) {
-      console.error('Error fetching intro:', err);
+      console.error('Error fetching intro for chapter', chapterNumber, ':', err);
       wholeChapterIntro = '';
     }
   }
@@ -113,10 +118,58 @@
    * Open whole chapter modal
    */
   async function openWholeChapterModal() {
+    showingEndOfChapter = false; // Show intro, not ending
     showWholeChapter = true;
     selectedVerse = null;
     if (selectedChapter) {
       await fetchChapterIntro(selectedChapter);
+    }
+  }
+
+  /**
+   * Fetch chapter ending (Om tatsaditi verse)
+   * The ending verse is always the last verse in the API array
+   */
+  async function fetchEndOfChapter(chapterNumber: number) {
+    // Check cache first
+    if (introCache.has(`end_${chapterNumber}`)) {
+      endOfChapterText = introCache.get(`end_${chapterNumber}`) || '';
+      console.log('Using cached end of chapter for chapter', chapterNumber);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/gita?q=${chapterNumber}`);
+      if (!response.ok) throw new Error('Failed to fetch ending');
+      
+      const json = await response.json();
+      let fetchedVerses = normalizeApiResponse(json);
+      
+      // The ending verse is always the last verse in the API array
+      const endVerse = fetchedVerses[fetchedVerses.length - 1];
+      
+      if (endVerse) {
+        const endingText = endVerse.lyrics || '';
+        console.log('Fetched end of chapter for chapter', chapterNumber, '- length:', endingText.length);
+        
+        endOfChapterText = endingText;
+        introCache.set(`end_${chapterNumber}`, endingText);
+      }
+    } catch (err) {
+      console.error('Error fetching end of chapter for chapter', chapterNumber, ':', err);
+      endOfChapterText = '';
+    }
+  }
+
+  /**
+   * Open end of chapter modal
+   */
+  async function openEndOfChapterModal() {
+    showingEndOfChapter = true; // Show ending, not intro
+    showWholeChapter = true;
+    selectedVerse = null;
+    if (selectedChapter) {
+      await fetchEndOfChapter(selectedChapter);
     }
   }
 
@@ -331,10 +384,15 @@
           {/each}
 
           <!-- End of Chapter Card -->
-          <div class="verse-scroll-card">
+          <div class="verse-scroll-card" on:click={openEndOfChapterModal}>
             <img src="/images/sletter.png" alt="End of Chapter" class="verse-scroll-bg" />
             <div class="verse-scroll-content">
               <div class="whole-chapter-text">End of<br/>Chapter</div>
+              <button class="verse-play-btn" title="Show chapter ending" on:click|stopPropagation={openEndOfChapterModal}>
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -350,10 +408,18 @@
       <button class="modal-close-btn" on:click={closeModal}>✕</button>
       <div class="modal-content">
         <div class="whole-chapter-content">
-          {#if wholeChapterIntro}
-            <div class="chapter-intro">
-              {@html wholeChapterIntro}
-            </div>
+          {#if showingEndOfChapter}
+            {#if endOfChapterText}
+              <div class="chapter-intro">
+                {@html endOfChapterText}
+              </div>
+            {/if}
+          {:else}
+            {#if wholeChapterIntro}
+              <div class="chapter-intro">
+                {@html wholeChapterIntro}
+              </div>
+            {/if}
           {/if}
         </div>
       </div>
