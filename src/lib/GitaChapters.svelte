@@ -129,15 +129,36 @@
   }
 
   /**
+   * Normalize API response into a consistent array format
+   * Handles multiple response structures that the API might return
+   */
+  function normalizeApiResponse(json: any): any[] {
+    if (!json) return [];
+
+    // CASE 1: Pure array response
+    if (Array.isArray(json)) return json;
+
+    // CASE 2: { data: [...] }
+    if (Array.isArray(json.data)) return json.data;
+
+    // CASE 3: { verses: [...] }
+    if (Array.isArray(json.verses)) return json.verses;
+
+    // CASE 4: No valid array found
+    return [];
+  }
+
+  /**
    * Fetch verses for a specific chapter from the API
    * Uses Vercel serverless API proxy to bypass CORS restrictions
+   * @param chapterNumber - The chapter to fetch
+   * @param background - If true, this is a background preload (won't update UI if another chapter is selected)
    */
-  async function fetchVerses(chapterNumber: number) {
+  async function fetchVerses(chapterNumber: number, background = false) {
     // Get the expected verse count for this chapter
     const currentChapter = chapters.find(ch => ch.id === chapterNumber);
     const expectedCount = currentChapter?.verseCount || 0;
 
-    // Skip cache - always fetch fresh to avoid API inconsistency issues
     isLoading = true;
     error = null;
 
@@ -159,51 +180,25 @@
         json = JSON.parse(text);
       }
 
-      console.log('API Response:', json);
+      // STEP 1: Normalize API response to clean array
+      let fetchedVerses = normalizeApiResponse(json);
+      console.log('Normalized verses:', fetchedVerses.length);
 
-      // Extract verses array from response - API returns {status, message, data, error}
-      let fetchedVerses = [];
-      
-      if (Array.isArray(json)) {
-        fetchedVerses = json;
-      } else if (json.data && Array.isArray(json.data)) {
-        fetchedVerses = json.data;
-      } else if (json.verses && Array.isArray(json.verses)) {
-        fetchedVerses = json.verses;
+      // STEP 2: Remove verse 0 (introduction verse, not numbered)
+      fetchedVerses = fetchedVerses.filter((v: any) => v.shlok_no > 0);
+      console.log('After filtering verse 0:', fetchedVerses.length);
+
+      // STEP 3: Enforce expected count (remove any extra verses)
+      fetchedVerses = fetchedVerses.slice(0, expectedCount);
+      console.log('After enforcing count:', fetchedVerses.length, 'Expected:', expectedCount);
+
+      // GUARD: Ignore stale background responses
+      if (background && selectedChapter !== chapterNumber) {
+        console.log('Stale background response ignored for chapter', chapterNumber);
+        return;
       }
 
-      console.log('Extracted verses before filtering:', fetchedVerses.length);
-
-      // CRITICAL: Limit to expected count BEFORE filtering verse 0
-      if (expectedCount > 0) {
-        // Slice to get expectedCount + 1 verses (including verse 0)
-        fetchedVerses = fetchedVerses.slice(0, expectedCount + 1);
-        console.log('After slicing to', expectedCount + 1, ':', fetchedVerses.length);
-      }
-
-      // Filter out verse 0 (introduction verse, not numbered) for display
-      console.log('First verse shlok_no:', fetchedVerses[0]?.shlok_no);
-      console.log('All shlok_no values:', fetchedVerses.map((v: any) => v.shlok_no));
-      
-      fetchedVerses = fetchedVerses.filter((verse: any) => {
-        const isValid = verse.shlok_no !== 0 && verse.shlok_no !== null && verse.shlok_no !== undefined;
-        return isValid;
-      });
-
-      console.log('After filtering verse 0:', fetchedVerses.length, 'Expected:', expectedCount);
-      
-      // Now slice to exact expected count
-      if (fetchedVerses.length > expectedCount) {
-        fetchedVerses = fetchedVerses.slice(0, expectedCount);
-        console.log('After final slice:', fetchedVerses.length);
-      }
-      
-      // Verify we have the correct count
-      if (fetchedVerses.length !== expectedCount) {
-        console.warn(`WARNING: Got ${fetchedVerses.length} verses but expected ${expectedCount}`);
-      }
-
-      // Store in cache AFTER filtering and validation
+      // Store in cache and update display
       versesCache.set(chapterNumber, fetchedVerses);
       verses = fetchedVerses;
 
@@ -228,15 +223,15 @@
   }
 
   onMount(() => {
-    // Clear old caches to ensure no verse 0 data is used
+    // Clear old caches to ensure no stale data
     versesCache.clear();
     introCache.clear();
     
     // Preload Chapter 1 immediately for smooth initial load
-    fetchVerses(1).then(() => {
-      // Preload other chapters in background
+    fetchVerses(1, false).then(() => {
+      // Preload other chapters in background (they won't overwrite UI)
       for (let i = 2; i <= 18; i++) {
-        fetchVerses(i);
+        fetchVerses(i, true);
       }
     });
     selectedChapter = null;
@@ -321,7 +316,7 @@
           </div>
 
           <!-- Individual Verse Cards -->
-          {#each verses.filter((v) => v.shlok_no > 0) as verse, index (verse.geeta_id || index)}
+          {#each verses as verse, index (verse.geeta_id || index)}
             <div class="verse-scroll-card" on:click={() => openVerseModal(verse)}>
               <img src="/images/sletter.png" alt={`Verse ${verse.shlok_no}`} class="verse-scroll-bg" />
               <div class="verse-scroll-content">
